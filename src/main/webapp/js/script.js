@@ -8,10 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let button = document.querySelector(".servlet-button");
     let responseDiv = document.querySelector(".response");
-    let wrapperProducts = document.querySelector(".wrapper-products");
+    let wrapperProducts = document.querySelector(".wrapper_cards");
+    let shoppingCartWrapper = document.querySelector(".shoppingCartCards_wrapper");
 
-
-    class Item {
+    class ItemProducts {
         constructor(idProduct) {
             this.id = idProduct;
             this.classes = ["products__item"];
@@ -20,12 +20,38 @@ document.addEventListener("DOMContentLoaded", function () {
         render() {
             const div = document.createElement("div");
             this.classes.forEach(className => div.classList.add(className));
-            div.innerHTML = `<p class="products__item-id">Здесь должен быть ваш ID ${this.id}</p>`;
+            div.innerHTML = `<div class="card">
+						<div class="card card_descr">Изделие с ID ${this.id}</div>
+						<div class="card add-to-cart-button" data-id="${this.id}">
+							<button>Добавить в корзину</button>
+						</div>
+					</div>`;
             this.containerElement.append(div);
             // console.log(div.innerText);
         }
     }
-
+    class ItemCartProducts {
+        constructor(id) {
+            this.id = id;
+            this.count = 1;
+            this.classes = ["products__item"];
+            this.containerElement = shoppingCartWrapper;
+        }
+        render() {
+            const div = document.createElement("div");
+            this.classes.forEach(className => div.classList.add(className));
+            div.innerHTML = `<div class="shoppingCartCard card">
+						<div class="card card_descr">Изделие с ID ${this.id}</div>
+						<input value="1" class="card card_count"></input>
+						<div class="card card_button add">
+							<button>+</button>
+						</div>
+						<div class="card card_button remove">
+							<button>-</button>
+						</div>
+					</div>`;
+        }
+    }
 
     const getResourse = async function (url) {
 
@@ -50,15 +76,25 @@ document.addEventListener("DOMContentLoaded", function () {
         // }
     });
 
+    let productsArray = [];
+    let addToCartButtons = [];
     getResourse("ajax-products-servlet").
         then(data => {
             // console.log(data.products);
+            productsArray = data.products;
             data.products.forEach(({ id }) => {
-                console.log("Hello World" + id);
-                new Item(id).render();
+                new ItemProducts(id).render();
+            });
+        }).then(() => {
+            addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+            console.log(addToCartButtons);
+
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    console.log(button.dataset.id);
+                });
+
             });
         });
 
-    console.log(document.querySelectorAll(".products__item"));
 });
-
